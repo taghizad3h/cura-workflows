@@ -76,9 +76,6 @@ jobs:
           conan config install https://github.com/Ultimaker/conan-config.git
           conan config install https://github.com/Ultimaker/conan-config.git -a "-b runner/${{ runner.os }}/${{ runner.arch }}"
 
-      - name: Add runner credentials to cura remote
-        run: conan user -p ${{ secrets.CONAN_PASS }} -r cura ${{ secrets.CONAN_USER }}
-
       - name: Add Cura private Artifactory remote
         if: ${{ inputs.conan_internal }}
         run: |
@@ -95,13 +92,3 @@ jobs:
 
       - name: Export the Package (binaries)
         run: conan create . ${{ inputs.recipe_id_full }} --build=missing --update ${{ inputs.conan_extra_args }}
-
-      - name: Upload the Package(s)
-        if: ${{ always() && !inputs.conan_internal }}
-        run: |
-          conan upload ${{ inputs.recipe_id_full }} -r cura --all -c
-
-      - name: Upload the Package(s) to the private Artifactory
-        if: ${{ always() && inputs.conan_internal }}
-        run: |
-          conan upload ${{ inputs.recipe_id_full }} -r cura-private --all -c
